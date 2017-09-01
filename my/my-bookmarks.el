@@ -2,7 +2,17 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("ko"
+(("quip-calendar"
+ (filename . "~/work/quip-elements/elements/project-calendar/src/")
+ (front-context-string . "styles\n  -rw-r--")
+ (rear-context-string . "36 Aug 21 14:48 ")
+ (position . 849))
+("quip"
+ (filename . "~/work/quip-elements/")
+ (front-context-string . "elements\n  -rw-r")
+ (rear-context-string . "08 Aug 21 14:48 ")
+ (position . 1283))
+("ko"
  (filename . "~/Dropbox/dev/ko/")
  (front-context-string . ".DS_Store\n  drwx")
  (rear-context-string . "48 Mar 22 17:19 ")

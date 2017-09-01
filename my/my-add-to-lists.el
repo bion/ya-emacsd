@@ -14,4 +14,8 @@
 (add-to-list 'auto-mode-alist '(".hamlc'" . haml-mode))
 (add-to-list 'auto-mode-alist '(".pug" . jade-mode))
 
+(add-to-list 'exec-path "/usr/local/bin")
+
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-14"))
+
 (provide 'my-add-to-lists)

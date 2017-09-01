@@ -308,6 +308,18 @@ uses pp if there is a prefix argument"
         (clipboard-kill-region (point-min) (point-max)))
       (message filename))))
 
+(defun ediff-last-kills ()
+  (interactive)
+  (let ((buffer-a (get-buffer-create "*ediff-kill-a*"))
+        (buffer-b (get-buffer-create "*ediff-kill-b*")))
+    (with-current-buffer buffer-a
+      (erase-buffer)
+      (insert (nth 0 kill-ring)))
+    (with-current-buffer buffer-b
+      (erase-buffer)
+      (insert (nth 1 kill-ring)))
+    (ediff-buffers buffer-a buffer-b)))
+
 ;; (defun dired-overtone-preview-waveform ()
 ;;  (interactive)
 ;;  (overtone-preview-waveform (dired-get-filename)))

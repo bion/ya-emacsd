@@ -1,9 +1,9 @@
 
 ;; ----- smex-history -----
 (
+ package-list-packages
  customize-set-variable
  about-emacs
- package-list-packages
  whitespace-mode
  next-error
  enh-ruby-mode
@@ -23,7 +23,7 @@
  (git-timemachine . 27)
  (rename-current-buffer-and-file . 212)
  (revert-buffer . 23)
- (package-list-packages . 81)
+ (package-list-packages . 82)
  (motion-mode . 1)
  (whitespace-mode . 70)
  (prettify-json . 25)
