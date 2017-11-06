@@ -13,8 +13,12 @@
 (add-to-list 'auto-mode-alist '(".hamlbars'" . haml-mode))
 (add-to-list 'auto-mode-alist '(".hamlc'" . haml-mode))
 (add-to-list 'auto-mode-alist '(".pug" . jade-mode))
+(add-to-list 'auto-mode-alist '(".scd" . sclang-mode))
+(add-to-list 'auto-mode-alist '(".sc" . sclang-mode))
 
-(add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path "/usr/local/bin" "/Users/bion/bin")
+(add-to-list 'exec-path "/Users/bion/bin")
+(add-to-list 'exec-path "/Applications/SuperCollider/SuperCollider.app/Contents/MacOS")
 
 (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-14"))
 

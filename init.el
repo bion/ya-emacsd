@@ -32,6 +32,7 @@
 (require 'my-package)
 (require 'my-autoloads)
 (require 'magit)
+(require 'sclang)
 (require 'my-functions)
 (require 'my-keybindings)
 (require 'my-hooks)

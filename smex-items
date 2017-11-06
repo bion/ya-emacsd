@@ -1,13 +1,13 @@
 
 ;; ----- smex-history -----
 (
- package-list-packages
- customize-set-variable
- about-emacs
- whitespace-mode
- next-error
- enh-ruby-mode
+ sclang-start
+ web-mode
  rename-current-buffer-and-file
+ linum-mode
+ fundamental-mode
+ html-mode
+ magit-status
 )
 
 ;; ----- smex-data -----
@@ -16,25 +16,25 @@
  (magit-blame-mode . 41)
  (eval-buffer . 11)
  (multi-term . 22)
- (buffer-menu . 41)
+ (buffer-menu . 42)
  (customize . 12)
  (line-number-mode . 3)
- (linum-mode . 192)
+ (linum-mode . 196)
  (git-timemachine . 27)
- (rename-current-buffer-and-file . 212)
+ (rename-current-buffer-and-file . 221)
  (revert-buffer . 23)
- (package-list-packages . 82)
+ (package-list-packages . 84)
  (motion-mode . 1)
  (whitespace-mode . 70)
  (prettify-json . 25)
  (flymake-mode . 25)
  (align-regexp . 28)
  (coffee-compile-buffer . 31)
- (html-mode . 34)
- (fundamental-mode . 43)
- (emacs-lisp-mode . 2)
+ (html-mode . 38)
+ (fundamental-mode . 48)
+ (emacs-lisp-mode . 3)
  (kill-ring-search . 26)
- (scss-mode . 15)
+ (scss-mode . 23)
  (ibuffer-diff-with-file . 1)
  (markdown-preview . 15)
  (cider-jack-in . 353)
@@ -52,7 +52,7 @@
  (hippie-expand . 12)
  (cider-eval-last-sexp . 1)
  (google-this . 3)
- (magit-status . 3)
+ (magit-status . 4)
  (blackbox . 5)
  (lunar-phases . 1)
  (cider-eval-buffer . 3)
@@ -65,7 +65,7 @@
  (rspec-find-spec-or-target-other-window . 13)
  (smart-rigid-indent . 1)
  (eval-and-replace . 6)
- (magit-blame . 168)
+ (magit-blame . 169)
  (zop-up-to-char . 4)
  (forward-sexp . 1)
  (cider-version . 1)
@@ -76,7 +76,7 @@
  (cider-interrupt . 1)
  (javascript-mode . 21)
  (clojure-mode . 40)
- (customize-mode . 42)
+ (customize-mode . 47)
  (tetris . 139)
  (edit-tab-stops . 5)
  (recover-this-file . 3)
@@ -94,7 +94,7 @@
  (enh-ruby-mode . 60)
  (smart-rigid-unindent . 3)
  (magit-blame-popup . 1)
- (sclang-mode . 2)
+ (sclang-mode . 3)
  (eval-current-buffer . 2)
  (ibuffer-do-sort-by-alphabetic . 1)
  (cider-repl-tab . 1)
@@ -108,7 +108,7 @@
  (proced . 1)
  (cider-apropos-documentation . 1)
  (bookmark-set . 7)
- (web-mode . 169)
+ (web-mode . 178)
  (ebuffers . 1)
  (js2-mode . 49)
  (auto-complete . 1)
@@ -197,14 +197,14 @@
  (about-emacs . 4)
  (org-w3m-copy-for-org-mode . 1)
  (paredit-forward-slurp-sexp . 1)
- (package-autoremove . 2)
+ (package-autoremove . 3)
  (js-jsx-mode . 3)
  (browse-web . 1)
  (tramp-bug . 1)
  (gh-md-export-buffer . 1)
  (gh-md-render-buffer . 1)
  (multi-occur . 1)
- (rjsx-mode . 8)
+ (rjsx-mode . 9)
  (yaml-mode . 1)
  (hanoi-unix . 1)
  (set-buffer-file-coding-system . 5)
@@ -216,4 +216,6 @@
  (toggle-enable-multibyte-characters . 12)
  (auto-compression-mode . 1)
  (customize-set-variable . 1)
+ (sclang-server-boot . 1)
+ (sclang-start . 12)
 )

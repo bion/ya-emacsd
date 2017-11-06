@@ -286,6 +286,10 @@ uses pp if there is a prefix argument"
   (let ((command (concat "~sampleBuffer.value(\"" path "\")")))
     (sclang-eval-string command)))
 
+(defun sclang-cmd-period ()
+  (interactive)
+  (sclang-eval-string "CmdPeriod.run"))
+
 (defun endless/visit-pull-request-url ()
   "Visit the current branch's PR on Github."
   (interactive)
