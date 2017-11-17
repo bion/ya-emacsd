@@ -156,11 +156,8 @@
  '(web-mode-attr-value-indent-offset 2)
  '(web-mode-code-indent-offset 2)
  '(web-mode-css-indent-offset 2)
-<<<<<<< Updated upstream
-=======
  '(web-mode-enable-auto-indentation nil)
  '(web-mode-enable-auto-quoting nil)
->>>>>>> Stashed changes
  '(web-mode-enable-whitespace-fontification nil)
  '(web-mode-markup-indent-offset 2)
  '(wgrep-auto-save-buffer t)
