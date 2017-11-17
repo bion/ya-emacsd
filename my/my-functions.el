@@ -324,12 +324,4 @@ uses pp if there is a prefix argument"
       (insert (nth 1 kill-ring)))
     (ediff-buffers buffer-a buffer-b)))
 
-;; (defun dired-overtone-preview-waveform ()
-;;  (interactive)
-;;  (overtone-preview-waveform (dired-get-filename)))
-
-;; (defun overtone-preview-waveform ()
-;;  (let ((command (concat "(preview-waveform \"" path "\")")))
-;;    (cider)))
-
 (provide 'my-functions)

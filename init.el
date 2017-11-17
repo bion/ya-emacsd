@@ -3,6 +3,8 @@
 (let ((default-directory "~/.emacs.d/"))
   (normal-top-level-add-subdirs-to-load-path))
 
+(setq use-package-always-ensure t)
+
 (setq ring-bell-function 'ignore)
 (setq mac-option-key-is-meta nil)
 (setq mac-command-key-is-meta t)

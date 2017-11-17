@@ -104,15 +104,18 @@
  '(magit-save-some-buffers nil)
  '(midnight-delay "1:00am")
  '(midnight-mode t nil (midnight))
- '(multi-term-program "/bin/zsh" t)
+ '(multi-term-program "/bin/zsh")
  '(multi-term-scroll-show-maximum-output t)
  '(mumamo-chunk-coloring 10)
  '(nxml-child-indent 2)
  '(nxml-outline-child-indent 2)
  '(package-selected-packages
    (quote
-    (rvm wgrep emojify sclang-extensions exec-path-from-shell move-dup prettier-js simp pug-mode yaml-mode rjsx-mode multi-term markdown-mode gh gh-md js2-mode web-mode ruby-additional rspec-mode sass-mode git-gutter sos figlet js3-mode enh-ruby-mode cider less-css-mode clojure-mode json-mode magit)))
+    (php-mode git-timemachine slim-mode rvm yaml-tomato exec-path-from-shell add-node-modules-path paradox prettier-js move-dup simp pug-mode yaml-mode rjsx-mode multi-term markdown-mode gh gh-md js2-mode web-mode ruby-additional rspec-mode sass-mode git-gutter sos figlet js3-mode enh-ruby-mode cider less-css-mode clojure-mode json-mode magit)))
  '(package-user-dir "~/.emacs.d/packages")
+ '(paradox-github-token t)
+ '(php-mode-coding-style (quote wordpress))
+ '(prettier-js-command "prettier")
  '(proced-auto-update-flag t)
  '(proced-auto-update-interval 1)
  '(proced-format (quote long))
@@ -143,6 +146,7 @@
  '(term-unbind-key-list (quote ("C-z" "C-x" "C-c" "C-h" "C-l" "<ESC>")))
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(tls-checktrust nil)
+ '(tramp-syntax (quote default) nil (tramp))
  '(transient-mark-mode t)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify))
  '(vc-handled-backends (quote (RCS CVS SVN SCCS Bzr Hg Mtn Arch)))
@@ -152,6 +156,11 @@
  '(web-mode-attr-value-indent-offset 2)
  '(web-mode-code-indent-offset 2)
  '(web-mode-css-indent-offset 2)
+<<<<<<< Updated upstream
+=======
+ '(web-mode-enable-auto-indentation nil)
+ '(web-mode-enable-auto-quoting nil)
+>>>>>>> Stashed changes
  '(web-mode-enable-whitespace-fontification nil)
  '(web-mode-markup-indent-offset 2)
  '(wgrep-auto-save-buffer t)

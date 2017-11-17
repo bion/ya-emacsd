@@ -6,8 +6,12 @@
                      .git
                      .css
                      private
-                     public
-                     .jhw-cache)))
+                     public)))
+
+  (simp-project-define
+   '(:type git
+           :has (.git)
+           :ignore (.git)))
 
   (simp-project-define
    `(:type rails
@@ -18,11 +22,6 @@
    '(:type node
            :has (node_modules)
            :ignore (.git log node_modules .bundle vendor)))
-
-  (simp-project-define
-   '(:type git
-           :has (.git)
-           :ignore (.git)))
 
   (simp-project-define
    '(:type emacs
