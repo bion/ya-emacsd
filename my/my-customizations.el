@@ -104,14 +104,14 @@
  '(magit-save-some-buffers nil)
  '(midnight-delay "1:00am")
  '(midnight-mode t nil (midnight))
- '(multi-term-program "/bin/zsh")
+ '(multi-term-program "/bin/zsh" t)
  '(multi-term-scroll-show-maximum-output t)
  '(mumamo-chunk-coloring 10)
  '(nxml-child-indent 2)
  '(nxml-outline-child-indent 2)
  '(package-selected-packages
    (quote
-    (php-mode git-timemachine slim-mode rvm yaml-tomato exec-path-from-shell add-node-modules-path paradox prettier-js move-dup simp pug-mode yaml-mode rjsx-mode multi-term markdown-mode gh gh-md js2-mode web-mode ruby-additional rspec-mode sass-mode git-gutter sos figlet js3-mode enh-ruby-mode cider less-css-mode clojure-mode json-mode magit)))
+    (wgrep php-mode git-timemachine slim-mode rvm yaml-tomato exec-path-from-shell add-node-modules-path paradox prettier-js move-dup simp pug-mode yaml-mode rjsx-mode multi-term markdown-mode gh gh-md js2-mode web-mode ruby-additional rspec-mode sass-mode git-gutter sos figlet js3-mode enh-ruby-mode cider less-css-mode clojure-mode json-mode magit)))
  '(package-user-dir "~/.emacs.d/packages")
  '(paradox-github-token t)
  '(php-mode-coding-style (quote wordpress))

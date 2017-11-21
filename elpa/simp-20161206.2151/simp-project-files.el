@@ -57,6 +57,27 @@ using the unix find command for speedy results"
             "file: "
             (simp-project-files)))))
 
+(defun test-simp-project-find-file ()
+  "find file in project, excluding project's ignored paths,
+using the unix find command for speedy results"
+  (interactive)
+  (find-file
+   (simp-completing-read
+    "file: "
+    (simp-project-files))))
+
+(defun test-test-test ()
+  "find file in project, excluding project's ignored paths,
+using the unix find command for speedy results"
+  (interactive)
+  (print (simp-project-files)))
+
+(defun test-test-test ()
+  "find file in project, excluding project's ignored paths,
+using the unix find command for speedy results"
+  (interactive)
+    (find-file "bin/bundle"))
+
 (defun simp-project-files ()
   "Returns a sorted list of files in a project, excluding project's
 ignored paths, using the unix find command for speedy results.
