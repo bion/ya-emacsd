@@ -11,15 +11,6 @@
 (setq mac-command-modifier 'meta)
 (setq mac-option-modifier nil)
 
-(defadvice rspec-compile (around rspec-compile-around)
-  "Use BASH shell for running the specs because of ZSH issues."
-  (let ((shell-file-name "/bin/bash"))
-    ad-do-it))
-
-(ad-activate 'rspec-compile)
-
-(setq rspec-use-rvm t)
-
 (toggle-frame-maximized)
 
 (require 'ido)
@@ -44,8 +35,4 @@
 (package-initialize)
 (require 'my-add-to-lists)
 
-(defun auto-complete-mode-maybe ()
-  (unless (minibufferp (current-buffer))
-    (auto-complete-mode 1)))
-
-(setq-default indent-tabs-mode nil)
+(server-start)

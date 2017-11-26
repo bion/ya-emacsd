@@ -20,6 +20,9 @@
 (setq-default kill-read-only-ok t
               indent-tabs-mode nil)
 
+(ad-activate 'rspec-compile)
+(setq rspec-use-rvm t)
+
 (set-default 'tramp-default-proxies-alist (quote ((".*" "\\`root\\'" "/ssh:%h:"))))
 ;; allows files to be opened like:
 ;; /sudo:root@host:
@@ -27,7 +30,8 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (put 'narrow-to-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
-(setq-default python-indent-offset 4)
+
+(setq-default indent-tabs-mode nil)
 
 (load custom-file)
 

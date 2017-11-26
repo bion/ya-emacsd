@@ -324,4 +324,8 @@ uses pp if there is a prefix argument"
       (insert (nth 1 kill-ring)))
     (ediff-buffers buffer-a buffer-b)))
 
+(defun auto-complete-mode-maybe ()
+  (unless (minibufferp (current-buffer))
+    (auto-complete-mode 1)))
+
 (provide 'my-functions)
