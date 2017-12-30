@@ -36,6 +36,7 @@
  '(emux-completing-read-command (quote ido-completing-read))
  '(emux-term-program "/bin/zsh")
  '(enh-ruby-add-encoding-comment-on-save nil)
+ '(enh-ruby-bounce-deep-indent t)
  '(eshell-cd-shows-directory nil)
  '(eshell-cmpl-cycle-completions t)
  '(eshell-cmpl-cycle-cutoff-length 10)
