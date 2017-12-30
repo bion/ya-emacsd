@@ -1,13 +1,13 @@
 
 ;; ----- smex-history -----
 (
- linum-mode
- prettier-js
- prettier-js-mode
- package-list-packages
- yaml-mode
- tetris
- test-test-test
+ enh-ruby-mode
+ rspec-find-spec-or-target-other-window
+ rename-current-buffer-and-file
+ ruby-mode
+ customize-mode
+ whitespace-mode
+ sort-lines
 )
 
 ;; ----- smex-data -----
@@ -15,23 +15,23 @@
  (simp-find-test-or-source-other-window . 8)
  (magit-blame-mode . 41)
  (eval-buffer . 11)
- (multi-term . 28)
- (buffer-menu . 41)
+ (multi-term . 30)
+ (buffer-menu . 42)
  (customize . 14)
  (line-number-mode . 3)
- (linum-mode . 197)
+ (linum-mode . 198)
  (git-timemachine . 32)
- (rename-current-buffer-and-file . 224)
+ (rename-current-buffer-and-file . 255)
  (revert-buffer . 26)
- (package-list-packages . 90)
+ (package-list-packages . 95)
  (motion-mode . 1)
- (whitespace-mode . 75)
- (prettify-json . 38)
- (flymake-mode . 25)
+ (whitespace-mode . 79)
+ (prettify-json . 39)
+ (flymake-mode . 30)
  (align-regexp . 28)
  (coffee-compile-buffer . 31)
  (html-mode . 37)
- (fundamental-mode . 46)
+ (fundamental-mode . 53)
  (emacs-lisp-mode . 2)
  (kill-ring-search . 26)
  (scss-mode . 15)
@@ -47,7 +47,7 @@
  (telnet . 1)
  (rbenv-use . 5)
  (bookmark-delete . 15)
- (ruby-mode . 119)
+ (ruby-mode . 122)
  (highline-customize . 1)
  (hippie-expand . 12)
  (cider-eval-last-sexp . 1)
@@ -62,10 +62,10 @@
  (rvm-activate-corresponding-ruby . 7)
  (rvm-use . 2)
  (describe-package . 1)
- (rspec-find-spec-or-target-other-window . 15)
+ (rspec-find-spec-or-target-other-window . 27)
  (smart-rigid-indent . 1)
  (eval-and-replace . 6)
- (magit-blame . 179)
+ (magit-blame . 189)
  (zop-up-to-char . 4)
  (forward-sexp . 1)
  (cider-version . 1)
@@ -76,7 +76,7 @@
  (cider-interrupt . 1)
  (javascript-mode . 22)
  (clojure-mode . 40)
- (customize-mode . 47)
+ (customize-mode . 50)
  (tetris . 140)
  (edit-tab-stops . 5)
  (recover-this-file . 3)
@@ -91,7 +91,7 @@
  (devolve-ruby-symbols . 3)
  (ruby-format-string-to-heredoc . 13)
  (apropos . 6)
- (enh-ruby-mode . 73)
+ (enh-ruby-mode . 85)
  (smart-rigid-unindent . 3)
  (magit-blame-popup . 1)
  (sclang-mode . 2)
@@ -117,7 +117,7 @@
  (apropos-command . 1)
  (cider-grimoire-web . 3)
  (paredit-mode . 20)
- (next-error . 14)
+ (next-error . 17)
  (hexl-mode . 1)
  (shell-script-mode . 25)
  (repunctuate-sentences . 1)
@@ -135,7 +135,7 @@
  (import-js-import . 3)
  (compile-defun . 1)
  (cider-jack-in-clojurescript . 1)
- (org-mode . 4)
+ (org-mode . 5)
  (org-html-export-to-html . 12)
  (org-html-export-as-html . 2)
  (markdown . 2)
@@ -197,7 +197,7 @@
  (about-emacs . 4)
  (org-w3m-copy-for-org-mode . 1)
  (paredit-forward-slurp-sexp . 1)
- (package-autoremove . 2)
+ (package-autoremove . 3)
  (js-jsx-mode . 3)
  (browse-web . 1)
  (tramp-bug . 1)
@@ -218,7 +218,7 @@
  (customize-set-variable . 1)
  (dired-do-symlink . 1)
  (yaml-tomato-show-current-path . 2)
- (prettier-js-mode . 10)
+ (prettier-js-mode . 14)
  (text-mode . 1)
  (cfengine2-mode . 1)
  (magit-rebase . 1)
@@ -232,4 +232,11 @@
  (simp-project-find-file . 1)
  (test-simp-project-find-file . 4)
  (test-test-test . 4)
+ (eshell . 1)
+ (rubocop-mode . 1)
+ (rubocop-check-current-file . 1)
+ (markdown-export . 1)
+ (compilation-mode . 1)
+ (ibuffer-mark-unsaved-buffers . 1)
+ (sort-lines . 3)
 )

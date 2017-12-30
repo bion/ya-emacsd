@@ -23,6 +23,8 @@
 (ad-activate 'rspec-compile)
 (setq rspec-use-rvm t)
 
+(setq fci-rule-column 80)
+
 (set-default 'tramp-default-proxies-alist (quote ((".*" "\\`root\\'" "/ssh:%h:"))))
 ;; allows files to be opened like:
 ;; /sudo:root@host:

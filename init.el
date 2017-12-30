@@ -34,5 +34,6 @@
 (require 'my-project-definitions)
 (package-initialize)
 (require 'my-add-to-lists)
+(require 'fill-column-indicator)
 
 (server-start)

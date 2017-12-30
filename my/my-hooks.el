@@ -36,27 +36,33 @@
  'ruby-mode-hook
  (lambda ()
    (smart-indent-rigidly-mode)
+   (fci-mode)
    (linum-mode)))
 
 (add-hook
  'enh-ruby-mode-hook
  (lambda ()
    (smart-indent-rigidly-mode)
+   (fci-mode)
    (linum-mode)))
 
 (add-hook
  'js-mode-hook
  (lambda ()
+   (fci-mode)
    (linum-mode)))
 
 (add-hook
  'js2-mode-hook
  (lambda ()
+   (fci-mode)
    (linum-mode)))
 
 (add-hook
  'web-mode-hook
  (lambda ()
+   (prettier-js-mode)
+   (fci-mode)
    (linum-mode)))
 
 (add-hook
@@ -67,6 +73,7 @@
 (add-hook
  'sass-mode-hook
  (lambda ()
+   (fci-mode)
    (smart-indent-rigidly-mode)))
 
 (add-hook
@@ -115,6 +122,7 @@
  (lambda ()
    (local-unset-key (kbd "M-j"))
    (eslint-set-closest)
+   (fci-mode)
    (flycheck-mode 1)))
 
 (add-hook
@@ -122,6 +130,7 @@
  (lambda ()
    (local-unset-key (kbd "M-j"))
    (linum-mode)
+   (fci-mode)
    (eslint-set-closest)
    (flycheck-mode 1)))
 
@@ -130,6 +139,7 @@
   "My PHP mode configuration."
   (setq indent-tabs-mode nil
         tab-width 2
+        (fci-mode)
         c-basic-offset 2))
 
 (defvar add-node-modules-path-debug nil

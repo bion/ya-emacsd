@@ -8,7 +8,8 @@
 ;; URL: http://github.com/zenspider/Enhanced-Ruby-Mode
 ;; Created: Sep 18 2010
 ;; Keywords: languages elisp, ruby
-;; Version: 1.0.1
+;; Package-Requires: ((emacs "24"))
+;; Version: 1.1.1
 
 ;; This file is not part of GNU Emacs.
 
@@ -107,6 +108,11 @@ the value changes.
   "Ignored in enhanced ruby mode."
   :options '(t nil space) :group 'enh-ruby)
 
+(defcustom enh-ruby-deep-indent-construct t
+  "*Deep indent constructs such as if, def, class and module when non-nil."
+  :group 'enh-ruby)
+(put 'enh-ruby-deep-indent-construct 'safe-local-variable 'booleanp)
+
 (defcustom enh-ruby-bounce-deep-indent nil
   "Bounce between normal indentation and deep indentation when non-nil."
   :group 'enh-ruby)
@@ -136,7 +142,12 @@ the value changes.
   "Adds ruby magic encoding comment on save when non-nil."
   :type 'boolean :group 'enh-ruby)
 
-(defcustom enh-ruby-encoding-map '((shift_jis . cp932) (shift-jis . cp932))
+(defcustom enh-ruby-encoding-map
+  '((us-ascii       . nil)       ;; Do not put coding: us-ascii
+    (utf-8          . nil)       ;; Do not put coding: utf-8
+    (shift-jis      . cp932)     ;; Emacs charset name of Shift_JIS
+    (shift_jis      . cp932)     ;; MIME charset name of Shift_JIS
+    (japanese-cp932 . cp932))    ;; Emacs charset name of CP932
   "Alist to map encoding name from emacs to ruby."
   :group 'enh-ruby)
 
@@ -146,6 +157,15 @@ the value changes.
 
 (defcustom enh-ruby-use-ruby-mode-show-parens-config nil
   "If not nil show-parens functionality from ruby-mode in 24.4 will be enabled"
+  :type 'boolean :group 'enh-ruby)
+
+(defconst enh-ruby-block-end-re "\\_<end\\_>")
+
+(defcustom enh-ruby-preserve-indent-in-heredocs nil
+  "Indent heredocs and multiline strings like text-mode.
+
+Warning: does not play well with electric-indent-mode.
+"
   :type 'boolean :group 'enh-ruby)
 
 (defconst enh-ruby-symbol-chars "a-zA-Z0-9_=?!")
@@ -192,6 +212,7 @@ the value changes.
     (define-key map (kbd "C-c C-e") 'enh-ruby-find-error)
     (define-key map (kbd "C-c C-f") 'enh-ruby-insert-end)
     (define-key map (kbd "C-c /")   'enh-ruby-insert-end)
+    (define-key map (kbd "C-c {")   'enh-ruby-toggle-block)
     (define-key map (kbd "M-C-u")   'enh-ruby-up-sexp)
     (define-key map (kbd "C-j")     'reindent-then-newline-and-indent)
     map)
@@ -229,13 +250,96 @@ the value changes.
     table)
   "Syntax table used by enh-ruby-mode buffers.")
 
-;;; Mode:
+(defconst enh-ruby-font-lock-keyword-beg-re "\\(?:^\\|[^.@$:]\\|\\.\\.\\)")
 
-(defalias 'enh-ruby-parent-mode
-  (if (fboundp 'prog-mode) 'prog-mode 'fundamental-mode))
+(defconst enh-ruby-font-lock-keywords
+  `(;; Core methods that have required arguments.
+    (,(concat
+       enh-ruby-font-lock-keyword-beg-re
+       (regexp-opt
+        '( ;; built-in methods on Kernel
+          "at_exit"
+          "autoload"
+          "autoload?"
+          "callcc"
+          "catch"
+          "eval"
+          "exec"
+          "format"
+          "lambda"
+          "load"
+          "loop"
+          "open"
+          "p"
+          "print"
+          "printf"
+          "proc"
+          "putc"
+          "puts"
+          "require"
+          "require_relative"
+          "spawn"
+          "sprintf"
+          "syscall"
+          "system"
+          "throw"
+          "trace_var"
+          "trap"
+          "untrace_var"
+          "warn"
+          ;; keyword-like private methods on Module
+          "alias_method"
+          "attr"
+          "attr_accessor"
+          "attr_reader"
+          "attr_writer"
+          "define_method"
+          "extend"
+          "include"
+          "module_function"
+          "prepend"
+          "private_class_method"
+          "private_constant"
+          "public_class_method"
+          "public_constant"
+          "refine"
+          "using")
+        'symbols))
+     (1 (unless (looking-at " *\\(?:[]|,.)}=]\\|$\\)")
+          font-lock-builtin-face)))
+    ;; Kernel methods that have no required arguments.
+    (,(concat
+       enh-ruby-font-lock-keyword-beg-re
+       (regexp-opt
+        '("__callee__"
+          "__dir__"
+          "__method__"
+          "abort"
+          "binding"
+          "block_given?"
+          "caller"
+          "exit"
+          "exit!"
+          "fail"
+          "fork"
+          "global_variables"
+          "local_variables"
+          "private"
+          "protected"
+          "public"
+          "raise"
+          "rand"
+          "readline"
+          "readlines"
+          "sleep"
+          "srand")
+        'symbols))
+     (1 font-lock-builtin-face))
+    )
+  "Additional expressions to highlight in enh-ruby-mode.")
 
 ;;;###autoload
-(define-derived-mode enh-ruby-mode enh-ruby-parent-mode "EnhRuby"
+(define-derived-mode enh-ruby-mode prog-mode "EnhRuby"
   "Enhanced Major mode for editing Ruby code.
 
 \\{enh-ruby-mode-map}"
@@ -257,12 +361,13 @@ the value changes.
   (setq-local beginning-of-defun-function  'enh-ruby-beginning-of-defun)
   (setq-local end-of-defun-function        'enh-ruby-end-of-defun)
 
-  (set (make-local-variable 'paragraph-start)
-       (concat "$\\|" page-delimiter))
-  (set (make-local-variable 'add-log-current-defun-function)
-       'enh-ruby-add-log-current-method)
+  (setq-local paragraph-start
+              (concat "$\\|" page-delimiter))
+  (setq-local add-log-current-defun-function
+              'enh-ruby-add-log-current-method)
 
-  (setq font-lock-defaults          '(nil t))
+  (setq-local font-lock-keywords    enh-ruby-font-lock-keywords)
+  (setq font-lock-defaults          '((enh-ruby-font-lock-keywords) t))
   (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
   (setq imenu-create-index-function 'enh-ruby-imenu-create-index)
 
@@ -469,6 +574,88 @@ the value changes.
   (delete-char -1)
   (self-insert-command (prefix-numeric-value arg)))
 
+(defun enh-ruby-brace-to-do-end (orig end)
+  (let (beg-marker end-marker)
+    (goto-char end)
+    (when (eq (char-before) ?\})
+      (delete-char -1)
+      (when (save-excursion
+              (skip-chars-backward " \t")
+              (not (bolp)))
+        (insert "\n"))
+      (insert "end")
+      (setq end-marker (point-marker))
+      (when (and (not (eobp)) (eq (char-syntax (char-after)) ?w))
+        (insert " "))
+      (goto-char orig)
+      (delete-char 1)
+      (when (eq (char-syntax (char-before)) ?w)
+        (insert " "))
+      (insert "do")
+      (setq beg-marker (point-marker))
+      (when (looking-at "\\(\\s \\)*|")
+        (unless (match-beginning 1)
+          (insert " "))
+        (goto-char (1+ (match-end 0)))
+        (search-forward "|"))
+      (unless (looking-at "\\s *$")
+        (insert "\n"))
+      (indent-region beg-marker end-marker)
+      (goto-char beg-marker)
+      t)))
+
+(defun enh-ruby-do-end-to-brace (orig end)
+  (let (beg-marker end-marker beg-pos end-pos)
+    (goto-char (- end 3))
+    (when (looking-at enh-ruby-block-end-re)
+      (delete-char 3)
+      (setq end-marker (point-marker))
+      (insert "}")
+      (goto-char orig)
+      (delete-char 2)
+      ;; Maybe this should be customizable, let's see if anyone asks.
+      (insert "{ ")
+      (setq beg-marker (point-marker))
+      (when (looking-at "\\s +|")
+        (delete-char (- (match-end 0) (match-beginning 0) 1))
+        (forward-char)
+        (re-search-forward "|" (line-end-position) t))
+      (save-excursion
+        (skip-chars-forward " \t\n\r")
+        (setq beg-pos (point))
+        (goto-char end-marker)
+        (skip-chars-backward " \t\n\r")
+        (setq end-pos (point)))
+      (when (or
+             (< end-pos beg-pos)
+             (and (= (line-number-at-pos beg-pos) (line-number-at-pos end-pos))
+                  (< (+ (current-column) (- end-pos beg-pos) 2) fill-column)))
+        (just-one-space -1)
+        (goto-char end-marker)
+        (just-one-space -1))
+      (goto-char beg-marker)
+      t)))
+
+(defun enh-ruby-toggle-block ()
+  "Toggle block type from do-end to braces or back.
+The block must begin on the current line or above it and end after the point.
+If the result is do-end block, it will always be multiline."
+  (interactive)
+  (let ((start (point)) beg end)
+    (end-of-line)
+    (unless
+        (if (and (re-search-backward "\\(?:[^#]\\)\\({\\)\\|\\(\\_<do\\_>\\)")
+                 (progn
+                   (goto-char (or (match-beginning 1) (match-beginning 2)))
+                   (setq beg (point))
+                   (save-match-data (enh-ruby-forward-sexp))
+                   (setq end (point))
+                   (> end start)))
+            (if (match-beginning 1)
+                (enh-ruby-brace-to-do-end beg end)
+              (enh-ruby-do-end-to-brace beg end)))
+      (goto-char start))))
+
 (defun enh-ruby-imenu-create-index-in-block (prefix beg end)
   (let* ((index-alist '())
          (pos beg)
@@ -489,13 +676,28 @@ the value changes.
 
 (defun enh-ruby-add-log-current-method ()
   "Return current method string."
-  ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
-  ;; for characters inside regexp literals.
   (condition-case nil
       (save-excursion
         (enh-ruby-beginning-of-defun 1)
         (when (looking-at enh-ruby-defun-and-name-re)
-          (concat (match-string 1) " " (match-string 2))))))
+          (let ((def-or-mod (match-string-no-properties 1))
+                (def-name   (match-string-no-properties 2)))
+            (if (string= "def" def-or-mod)
+                (progn
+                  (enh-ruby-up-sexp)
+                  (when (looking-at enh-ruby-defun-and-name-re)
+                    (let ((mod-or-class (match-string-no-properties 1))
+                          (mod-name   (match-string-no-properties 2)))
+                      (let* ((meth-name-re (concat
+                                            (regexp-opt (list "self" mod-name)
+                                                        'words)
+                                            "\\.\\(.+\\)"))
+                             (cls-meth (and (string-match meth-name-re def-name)
+                                            (match-string 2 def-name)))
+                             (name (or cls-meth def-name))
+                             (sep (if cls-meth "." "#")))
+                        (concat mod-name sep name)))))
+              nil))))))
 
 ;; Stolen shamelessly from James Clark's nxml-mode.
 (defmacro erm-with-unmodifying-text-property-changes (&rest body)
@@ -574,9 +776,12 @@ modifications to the buffer."
              (string= erm-process-delimiter (substring erm-response -5 nil)))
     (setq response (substring erm-response 0 -5))
     (setq erm-response "")
-    (with-current-buffer erm-parse-buff
-      (erm-with-unmodifying-text-property-changes
-       (erm-parse response)))))
+    (unless (buffer-live-p erm-parse-buff)
+      (erm-reset))
+    (when (buffer-live-p erm-parse-buff)
+      (with-current-buffer erm-parse-buff
+        (erm-with-unmodifying-text-property-changes
+         (erm-parse response))))))
 
 (defsubst erm-ready ()
   (if erm-full-parse-p
@@ -616,12 +821,16 @@ modifications to the buffer."
          ((or (eq 'e prop) (eq 's prop))
           (when (eq 's prop) (forward-char))
           (enh-ruby-backward-sexp)
-          (if (not (eq 'd (get-text-property (point) 'indent)))
-              (current-column)
-            (setq pos (point))
-            (enh-ruby-skip-non-indentable)
-            (enh-ruby-calculate-indent-1 pos (line-beginning-position))))
-
+          (let ((bprop (get-text-property (point) 'indent)))
+            (cond ((eq 'd bprop)
+                   (setq pos (point))
+                   (enh-ruby-skip-non-indentable)
+                   (enh-ruby-calculate-indent-1 pos (line-beginning-position)))
+                  ((and (not enh-ruby-deep-indent-construct)
+                        (eq 'b bprop))
+                   (current-indentation))
+                  (t
+                   (current-column)))))
          ((eq 'r prop)
           (let ((opening-col
                  (save-excursion (enh-ruby-backward-sexp) (current-column))))
@@ -645,6 +854,9 @@ modifications to the buffer."
          ((or (memq face '(font-lock-string-face enh-ruby-heredoc-delimiter-face))
               (and (eq 'font-lock-variable-name-face face)
                    (looking-at "#")))
+          (when enh-ruby-preserve-indent-in-heredocs
+            (forward-line -1)
+            (back-to-indentation))
           (current-column))
 
          (t
@@ -721,6 +933,13 @@ modifications to the buffer."
         (if pc (setq pc (cdr pc)) (setq npc col)))
 
        ((memq prop '(b d s))
+        (and (not enh-ruby-deep-indent-construct)
+             (eq prop 'b)
+             (setq col
+                   (- col (- (save-excursion
+                               (goto-char pos)
+                               (current-column))
+                             (current-indentation)))))
         (setq bc (cons col bc)))
 
        ((eq prop 'e)
@@ -1007,13 +1226,17 @@ With ARG, do it that many times."
     ))
 
 (defun enh-ruby-previous-indent-change (pos)
-  (and pos (setq pos (1- pos))
+  (and pos
+       (setq pos (1- pos))
        (>= pos (point-min))
-       (or (and (get-text-property pos 'indent) pos)
+       (or (and (get-text-property pos 'indent)
+                pos)
            (and (> pos (point-min))
                 (get-text-property (1- pos) 'indent)
                 (1- pos))
-           (enh-ruby-previous-indent-change (previous-single-property-change pos 'indent)))))
+           (enh-ruby-previous-indent-change (previous-single-property-change pos 'indent))
+           (point-min)
+           )))
 
 (defun enh-ruby-next-indent-change (pos)
   (and pos (setq pos (1+ pos))

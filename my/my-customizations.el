@@ -36,8 +36,6 @@
  '(emux-completing-read-command (quote ido-completing-read))
  '(emux-term-program "/bin/zsh")
  '(enh-ruby-add-encoding-comment-on-save nil)
- '(enh-ruby-deep-indent-paren nil)
- '(enh-ruby-hanging-paren-indent-level 0)
  '(eshell-cd-shows-directory nil)
  '(eshell-cmpl-cycle-completions t)
  '(eshell-cmpl-cycle-cutoff-length 10)
@@ -111,7 +109,7 @@
  '(nxml-outline-child-indent 2)
  '(package-selected-packages
    (quote
-    (wgrep php-mode git-timemachine slim-mode rvm yaml-tomato exec-path-from-shell add-node-modules-path paradox prettier-js move-dup simp pug-mode yaml-mode rjsx-mode multi-term markdown-mode gh gh-md js2-mode web-mode ruby-additional rspec-mode sass-mode git-gutter sos figlet js3-mode enh-ruby-mode cider less-css-mode clojure-mode json-mode magit)))
+    (fill-column-indicator enh-ruby-mode inf-ruby flymake-ruby flycheck rubocop wgrep php-mode git-timemachine slim-mode rvm yaml-tomato exec-path-from-shell add-node-modules-path paradox prettier-js move-dup simp pug-mode yaml-mode rjsx-mode multi-term markdown-mode gh gh-md js2-mode web-mode ruby-additional rspec-mode sass-mode git-gutter sos figlet js3-mode cider less-css-mode clojure-mode json-mode magit)))
  '(package-user-dir "~/.emacs.d/packages")
  '(paradox-github-token t)
  '(php-mode-coding-style (quote wordpress))
@@ -119,9 +117,6 @@
  '(proced-auto-update-flag t)
  '(proced-auto-update-interval 1)
  '(proced-format (quote long))
- '(ruby-deep-arglist nil)
- '(ruby-deep-indent-paren nil)
- '(ruby-deep-indent-paren-style nil)
  '(ruby-insert-encoding-magic-comment nil)
  '(save-interprogram-paste-before-kill t)
  '(save-place t nil (saveplace))
