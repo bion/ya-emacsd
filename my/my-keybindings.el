@@ -5,6 +5,7 @@
 
 (define-key dired-mode-map (kbd "M-s") 'dired-sclang-preview-soundfile)
 (define-key sclang-mode-map (kbd "C-x x") 'sclang-cmd-period)
+(define-key sclang-mode-map (kbd "C-c n") 'sclang-query-all-nodes)
 
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)

@@ -290,6 +290,10 @@ uses pp if there is a prefix argument"
   (interactive)
   (sclang-eval-string "CmdPeriod.run"))
 
+(defun sclang-query-all-nodes ()
+  (interactive)
+  (sclang-eval-string "s.queryAllNodes"))
+
 (defun endless/visit-pull-request-url ()
   "Visit the current branch's PR on Github."
   (interactive)
