@@ -21,6 +21,7 @@
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 (add-hook 'emms-player-started-hook 'emms-show)
 (add-hook 'after-init-hook 'inf-ruby-switch-setup)
+(add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
 
 (add-hook
  'magit-status-mode-hook
