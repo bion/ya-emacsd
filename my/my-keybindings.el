@@ -31,6 +31,7 @@
 (global-set-key (kbd "<backtab>") 'smart-rigid-unindent)
 
 (global-set-key (kbd "C-S-y") 'kill-ring-search)
+(global-set-key (kbd "C-S-j") (lambda () (interactive) (join-line -1)))
 (global-set-key (kbd "C-S-i") 'indent-region)
 
 (global-set-key (kbd "C-S-p") 'md/move-lines-up)
