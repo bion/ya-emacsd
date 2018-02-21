@@ -332,4 +332,18 @@ uses pp if there is a prefix argument"
   (unless (minibufferp (current-buffer))
     (auto-complete-mode 1)))
 
+(defun increment-number-at-point ()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point"))
+  (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
+
+(defun decrement-number-at-point ()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point"))
+  (replace-match (number-to-string (1- (string-to-number (match-string 0))))))
+
 (provide 'my-functions)

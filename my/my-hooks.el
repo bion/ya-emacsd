@@ -51,20 +51,17 @@
 (add-hook
  'js-mode-hook
  (lambda ()
-   (fci-mode)
    (linum-mode)))
 
 (add-hook
  'js2-mode-hook
  (lambda ()
-   (fci-mode)
    (linum-mode)))
 
 (add-hook
  'web-mode-hook
  (lambda ()
    (prettier-js-mode)
-   (fci-mode)
    (linum-mode)))
 
 (add-hook
@@ -132,7 +129,6 @@
  (lambda ()
    (local-unset-key (kbd "M-j"))
    (linum-mode)
-   (fci-mode)
    (eslint-set-closest)
    (flycheck-mode 1)))
 
