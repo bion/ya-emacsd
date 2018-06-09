@@ -101,6 +101,7 @@
  '(magit-commit-all-when-nothing-staged (quote ask-stage))
  '(magit-completing-read-function (quote ido-completing-read))
  '(magit-default-tracking-name-function (quote magit-tracking-name-unfucked-with))
+ '(magit-log-section-commit-count 0)
  '(magit-save-some-buffers nil)
  '(midnight-delay "1:00am")
  '(midnight-mode t nil (midnight))
@@ -111,7 +112,7 @@
  '(nxml-outline-child-indent 2)
  '(package-selected-packages
    (quote
-    (tern dumb-jump tide pdf-tools git-link gist flow-minor-mode fill-column-indicator enh-ruby-mode inf-ruby flymake-ruby flycheck rubocop wgrep php-mode git-timemachine slim-mode rvm yaml-tomato exec-path-from-shell add-node-modules-path paradox prettier-js move-dup simp pug-mode yaml-mode rjsx-mode multi-term markdown-mode gh gh-md js2-mode web-mode ruby-additional rspec-mode sass-mode git-gutter sos figlet js3-mode cider less-css-mode clojure-mode json-mode magit)))
+    (smart-indent-rigidly tern dumb-jump tide pdf-tools git-link gist flow-minor-mode fill-column-indicator enh-ruby-mode inf-ruby flymake-ruby flycheck rubocop wgrep php-mode git-timemachine slim-mode rvm yaml-tomato exec-path-from-shell add-node-modules-path paradox prettier-js move-dup simp pug-mode yaml-mode rjsx-mode multi-term markdown-mode gh gh-md js2-mode web-mode ruby-additional rspec-mode sass-mode git-gutter sos figlet js3-mode cider less-css-mode clojure-mode json-mode magit)))
  '(package-user-dir "~/.emacs.d/packages")
  '(paradox-github-token t)
  '(php-mode-coding-style (quote wordpress))
