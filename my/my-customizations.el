@@ -28,6 +28,7 @@
  '(css-indent-offset 2)
  '(delete-old-versions t)
  '(delete-selection-mode t)
+ '(dired-dwim-target t)
  '(dired-efap-initial-filename-selection nil)
  '(display-time-mode t)
  '(electric-pair-mode nil)

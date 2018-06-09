@@ -1,13 +1,13 @@
 
 ;; ----- smex-history -----
 (
+ paradox-list-packages
+ ispell
+ auto-fill-mode
  tetris
  sclang-start
  fill-paragraph
  whitespace-mode
- whitespace-cleanup
- untabify-all
- cider-jack-in
 )
 
 ;; ----- smex-data -----
@@ -190,7 +190,7 @@
  (sos . 2)
  (bookmark-rename . 1)
  (bookmark-relocate . 1)
- (ispell . 6)
+ (ispell . 7)
  (checkdoc-ispell . 1)
  (ispell-minor-check . 1)
  (sass-mode . 3)
@@ -236,7 +236,7 @@
  (sclang-kill . 1)
  (server-start . 1)
  (server-edit . 1)
- (paradox-list-packages . 5)
+ (paradox-list-packages . 6)
  (inf-ruby . 4)
  (inf-ruby-enable-auto-breakpoint . 1)
  (inf-ruby-mode . 2)
@@ -249,7 +249,7 @@
  (projectile-mode . 2)
  (dumb-jump-go . 1)
  (sclang-find-help . 1)
- (auto-fill-mode . 1)
+ (auto-fill-mode . 2)
  (rubocop-autocorrect-current-file . 1)
  (fill-paragraph . 20)
  (shell . 1)
