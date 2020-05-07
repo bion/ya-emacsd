@@ -47,14 +47,11 @@
   (customize-group 'sclang))
 
 (eval-and-compile
-  (require 'cl))
-
-(eval-and-compile
   (let ((load-path
-         (if (and (boundp 'byte-compile-dest-file)
-                  (stringp byte-compile-dest-file))
-             (cons (file-name-directory byte-compile-dest-file) load-path)
-           load-path)))
+	 (if (and (boundp 'byte-compile-dest-file)
+		  (stringp byte-compile-dest-file))
+	     (cons (file-name-directory byte-compile-dest-file) load-path)
+	   load-path)))
     (require 'sclang-util)
     (require 'sclang-browser)
     (require 'sclang-interp)

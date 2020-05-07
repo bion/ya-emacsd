@@ -1,4 +1,6 @@
-(setq custom-file "~/.emacs.d/my/my-customizations.el"
+(setq
+      eclimd-autostart t
+      custom-file "~/.emacs.d/my/my-customizations.el"
       inferior-lisp-program "clisp -K full"
       tramp-default-method "ssh"
       ido-enable-flex-matching t
@@ -17,6 +19,11 @@
       magit-completing-read 'ido-completing-read
       font-lock-maximum-decoration t)
 
+(custom-set-variables
+  '(eclim-eclipse-dirs '("/Users/bion/eclipse/java-2018-09/Eclipse.app/Contents/Eclipse"))
+  '(eclimd-executable "/Users/bion/eclipse/java-2018-09/Eclipse.app/Contents/Eclipse/eclimd"))
+
+(setq epa-pinentry-mode 'loopback)
 (setq-default kill-read-only-ok t
               indent-tabs-mode nil)
 

@@ -15,9 +15,7 @@
 ;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 ;; USA
 
-(eval-when-compile
-  (require 'cl))
-
+(require 'cl-lib)
 (require 'sclang-browser)
 (require 'sclang-interp)
 (require 'sclang-util)
@@ -71,7 +69,7 @@ The expressions are joined as alternatives with the \\| operator."
   "Regular expression matching method names.")
 
 (defconst sclang-class-name-regexp
-  "\\(?:Meta_\\)?[A-Z]\\(?:\\sw\\|\\s_\\)*"
+  "\\<\\(?:Meta_\\)?[A-Z]\\(?:\\sw\\|\\s_\\)*"
   "Regular expression matching class names.")
 
 (defconst sclang-primitive-name-regexp
@@ -86,10 +84,10 @@ The expressions are joined as alternatives with the \\| operator."
 
 (defconst sclang-class-definition-regexp
   (concat "^\\s *\\("
-          sclang-class-name-regexp
-          "\\)\\(?:\\s *:\\s *\\("
-          sclang-class-name-regexp
-          "\\)\\)?[[:space:]]*{")
+	  sclang-class-name-regexp
+	  "\\)\\(?:\\s *:\\s *\\("
+	  sclang-class-name-regexp
+	  "\\)\\)?[[:space:]]*{")
   "Regular expression matching class definitions.")
 
 (defconst sclang-method-definition-regexp
@@ -115,8 +113,8 @@ enclosed by parenthesis (`sclang-block-regexp').")
 
 (defconst sclang-method-definition-spec-regexp
   (concat (sclang-regexp-group sclang-class-name-regexp t)
-          "-"
-          (sclang-regexp-group sclang-method-name-regexp t))
+	  "-"
+	  (sclang-regexp-group sclang-method-name-regexp t))
   "Regular expression matching definition specifications.
 
 A specification is of the form <class-name>-<method-name>.")
@@ -128,13 +126,13 @@ A specification is of the form <class-name>-<method-name>.")
 (defun sclang-make-class-definition-regexp (name)
   "Return a regular expression matching the class definition NAME."
   (concat "\\(" (regexp-quote name) "\\)"
-          "\\(?:\\s *:\\s *\\(" sclang-class-name-regexp "\\)\\)?"
-          "[[:space:]]*{"))
+	  "\\(?:\\s *:\\s *\\(" sclang-class-name-regexp "\\)\\)?"
+	  "[[:space:]]*{"))
 
 (defun sclang-make-class-extension-regexp (name)
   "Return a regular expression matching the class extension NAME."
   (concat "\\+\\s *\\(" (regexp-quote name) "\\)"
-          "\\s *{"))
+	  "\\s *{"))
 
 (defun sclang-make-method-definition-regexp (name)
   "Return a regular expression matching the method definition NAME."
@@ -207,6 +205,9 @@ low-resource systems."
 (defvar sclang-symbol-table nil
   "List of all defined symbols.")
 
+(defvar sclang-class-list nil
+  "List of all defined classes.")
+
 (defvar sclang-symbol-history nil
   "List of recent symbols read from the minibuffer.")
 
@@ -216,21 +217,25 @@ low-resource systems."
  'symbolTable
  (lambda (arg)
    (when (and sclang-use-symbol-table arg)
-     (setq sclang-symbol-table (sort arg 'string<))
+     (setq sclang-symbol-table (sort arg 'string-lessp))
+     (setq sclang-class-list (cl-remove-if
+                              (lambda (x) (or (not (sclang-class-name-p x))
+                                              (sclang-string-match "^Meta_" x)))
+                              sclang-symbol-table))
      (sclang-update-font-lock))))
 
 (add-hook 'sclang-library-startup-hook
-          (lambda ()
-            (when sclang-use-symbol-table
-              (let ((file (make-temp-file "sclang-symbol-table.")))
-                (when (and file (file-exists-p file))
-                  (setq sclang-symbol-table-file file)
-                  (sclang-perform-command 'symbolTable file))))))
+	  (lambda ()
+	    (when sclang-use-symbol-table
+	      (let ((file (make-temp-file "sclang-symbol-table.")))
+		(when (and file (file-exists-p file))
+		  (setq sclang-symbol-table-file file)
+		  (sclang-perform-command 'symbolTable file))))))
 
 (add-hook 'sclang-library-shutdown-hook
-          (lambda ()
-            (setq sclang-symbol-table nil)
-            (sclang-update-font-lock)))
+	  (lambda ()
+	    (setq sclang-symbol-table nil)
+	    (sclang-update-font-lock)))
 
 (defun sclang-get-symbol-completion-table ()
   (mapcar (lambda (s) (cons s nil)) sclang-symbol-table))
@@ -245,26 +250,26 @@ low-resource systems."
 
 (defun sclang-read-symbol (prompt &optional default predicate require-match inherit-input-method)
   (if sclang-use-symbol-table
-      (flet ((make-minibuffer-local-map
-              (parent-keymap)
-              (let ((map (make-sparse-keymap)))
-                (set-keymap-parent map parent-keymap)
-                ;; override keys bound to valid symbols
-                (define-key map [??] 'self-insert-command)
-                map)))
-        (let ((symbol (sclang-get-symbol default))
-              (minibuffer-local-completion-map (make-minibuffer-local-map
-                                                minibuffer-local-completion-map))
-              (minibuffer-local-must-match-map (make-minibuffer-local-map
-                                                minibuffer-local-completion-map)))
-          (completing-read (sclang-make-prompt-string prompt symbol)
-                           (sclang-get-symbol-completion-table)
-                           (sclang-make-symbol-completion-predicate predicate)
-                           require-match nil
-                           'sclang-symbol-history symbol
-                           inherit-input-method)))
+      (cl-flet ((make-minibuffer-local-map
+	      (parent-keymap)
+	      (let ((map (make-sparse-keymap)))
+		(set-keymap-parent map parent-keymap)
+		;; override keys bound to valid symbols
+		(define-key map [??] 'self-insert-command)
+		map)))
+	(let ((symbol (sclang-get-symbol default))
+	      (minibuffer-local-completion-map (make-minibuffer-local-map
+						minibuffer-local-completion-map))
+	      (minibuffer-local-must-match-map (make-minibuffer-local-map
+						minibuffer-local-completion-map)))
+	  (completing-read (sclang-make-prompt-string prompt symbol)
+			   (sclang-get-symbol-completion-table)
+			   (sclang-make-symbol-completion-predicate predicate)
+			   require-match nil
+			   'sclang-symbol-history symbol
+			   inherit-input-method)))
     (read-string (sclang-make-prompt-string prompt default) nil
-                 'sclang-symbol-history default inherit-input-method)))
+		 'sclang-symbol-history default inherit-input-method)))
 
 ;; =====================================================================
 ;; buffer movement
@@ -280,30 +285,30 @@ Use font-lock information if font-lock-mode is enabled."
     ;; else parse from the beginning
     (save-excursion
       (let ((beg (point)))
-        (beginning-of-defun)
-        (not (null (nth 4 (parse-partial-sexp (point) beg))))))))
+	(beginning-of-defun)
+	(not (null (nth 4 (parse-partial-sexp (point) beg))))))))
 
 (defun sclang-beginning-of-defun (&optional arg)
   (interactive "p")
   (let ((case-fold-search nil)
-        (arg (or arg (prefix-numeric-value current-prefix-arg)))
-        (orig (point))
-        (success t))
+	(arg (or arg (prefix-numeric-value current-prefix-arg)))
+	(orig (point))
+	(success t))
     (while (and success (> arg 0))
       (setq success (re-search-backward sclang-beginning-of-defun-regexp
-                                        nil 'move))
+					nil 'move))
       (when (and success (not (sclang-point-in-comment-p)))
-        (goto-char (match-beginning 0))
-        (setq arg (1- arg))))
+	(goto-char (match-beginning 0))
+	(setq arg (1- arg))))
     (while (and success (< arg 0))
       (setq success (re-search-forward sclang-beginning-of-defun-regexp nil t))
       (when (and success (not (sclang-point-in-comment-p)))
-        (goto-char (match-end 0))
-        (setq arg (1+ arg))))
+	(goto-char (match-end 0))
+	(setq arg (1+ arg))))
     (when success
       (beginning-of-line)
       (cond ((looking-at sclang-block-regexp) (goto-char (1- (match-end 1))))
-            ((looking-at sclang-class-definition-regexp) (goto-char (1- (match-end 0)))))
+	    ((looking-at sclang-class-definition-regexp) (goto-char (1- (match-end 0)))))
       t)))
 
 (defun sclang-point-in-defun-p ()
@@ -311,38 +316,38 @@ Use font-lock information if font-lock-mode is enabled."
 Return value is nil or (beg end) of defun."
   (save-excursion
     (let ((orig (point))
-          beg end)
+	  beg end)
       (and (progn (end-of-line) (beginning-of-defun-raw 1) t)
-           (setq beg (point))
-           (condition-case nil (forward-list 1) (error nil))
-           (setq end (point))
-           (list beg end)))))
+	   (setq beg (point))
+	   (condition-case nil (forward-list 1) (error nil))
+	   (setq end (point))
+	   (list beg end)))))
 
 (defun sclang-end-of-defun (&optional arg)
   (interactive "p")
   (let ((case-fold-search nil)
-        (arg (or arg (prefix-numeric-value current-prefix-arg)))
-        (success t)
-        n cur)
+	(arg (or arg (prefix-numeric-value current-prefix-arg)))
+	(success t)
+	n cur)
     (while (and success (> arg 0))
       (setq n (if (sclang-point-in-defun-p) 1 -1))
       (setq cur (point))
       (if (and (sclang-beginning-of-defun n)
-               (condition-case nil (forward-list 1) (error nil)))
-          (progn
-            (setq arg (1- arg)))
-        (goto-char cur)
-        (setq success nil)))
+	       (condition-case nil (forward-list 1) (error nil)))
+	  (progn
+	    (setq arg (1- arg)))
+	(goto-char cur)
+	(setq success nil)))
     (while (and success (< arg 0))
       (setq n (if (sclang-point-in-defun-p) 2 1))
       (setq cur (point))
       (if (and (sclang-beginning-of-defun n)
-               (condition-case nil (forward-list 1) (error nil)))
-          (progn
-            (backward-char 1)
-            (setq arg (1+ arg)))
-        (goto-char cur)
-        (setq success nil)))
+	       (condition-case nil (forward-list 1) (error nil)))
+	  (progn
+	    (backward-char 1)
+	    (setq arg (1+ arg)))
+	(goto-char cur)
+	(setq success nil)))
     (when success
       (forward-line 1) t)))
 
@@ -360,20 +365,20 @@ symbol matched, candidates are `sclang-symbol-name-regexp' and
   (save-excursion
     (with-syntax-table sclang-mode-syntax-table
       (let ((case-fold-search nil)
-            beg end)
-        (cond ((looking-at sclang-method-name-special-regexp)
-               (skip-chars-backward sclang-method-name-special-chars)
-               (setq beg (point))
-               (skip-chars-forward sclang-method-name-special-chars)
-               (setq end (point)))
-              (t
-               (skip-syntax-backward "w_")
-               (setq beg (point))
-               (skip-syntax-forward "w_")
-               (setq end (point))))
-        (goto-char beg)
-        (if (looking-at (or symbol-name-regexp sclang-symbol-name-regexp))
-            (buffer-substring-no-properties beg end))))))
+	    beg end)
+	(cond ((looking-at sclang-method-name-special-regexp)
+	       (skip-chars-backward sclang-method-name-special-chars)
+	       (setq beg (point))
+	       (skip-chars-forward sclang-method-name-special-chars)
+	       (setq end (point)))
+	      (t
+	       (skip-syntax-backward "w_")
+	       (setq beg (point))
+	       (skip-syntax-forward "w_")
+	       (setq end (point))))
+	(goto-char beg)
+	(if (looking-at (or symbol-name-regexp sclang-symbol-name-regexp))
+	    (buffer-substring-no-properties beg end))))))
 
 (defun sclang-line-at-point ()
   "Return the line at point."
@@ -386,8 +391,8 @@ A defun may either be a class definition or a code block, see
 `sclang-beginning-of-defun-regexp'."
   (save-excursion
     (with-syntax-table sclang-mode-syntax-table
-      (multiple-value-bind (beg end) (sclang-point-in-defun-p)
-        (and beg end (buffer-substring-no-properties beg end))))))
+      (cl-multiple-value-bind (beg end) (sclang-point-in-defun-p)
+	(and beg end (buffer-substring-no-properties beg end))))))
 
 ;; =====================================================================
 ;; symbol completion
@@ -405,48 +410,66 @@ class name completion is performed, otherwise only selector names
 are considered."
   (interactive)
   (let* ((buffer (current-buffer))
-         (end (point))
-         (beg (save-excursion
-                (backward-sexp 1)
-                (skip-syntax-forward "'")
-                (point)))
-         (pattern (buffer-substring-no-properties beg end))
-         (case-fold-search nil)
-         (table (sclang-get-symbol-completion-table))
-         (predicate (or predicate
-                        (if (sclang-class-name-p pattern)
-                            'sclang-class-name-p
-                          'sclang-method-name-p)))
-         (completion (try-completion pattern table (lambda (assoc) (funcall predicate (car assoc))))))
+	 (end (point))
+	 (beg (save-excursion
+		(backward-sexp 1)
+		(skip-syntax-forward "'")
+		(point)))
+	 (pattern (buffer-substring-no-properties beg end))
+	 (case-fold-search nil)
+	 (table (sclang-get-symbol-completion-table))
+	 (predicate (or predicate
+			(if (sclang-class-name-p pattern)
+			    'sclang-class-name-p
+			  'sclang-method-name-p)))
+	 (completion (try-completion pattern table (lambda (assoc) (funcall predicate (car assoc))))))
     (cond ((eq completion t))
-          ((null completion)
-           (sclang-message "Can't find completion for '%s'" pattern)
-           (ding))
-          ((not (string= pattern completion))
-           (delete-region beg end)
-           (insert completion))
-          (t
-           (sclang-message "Making completion list...")
-           (let* ((list (all-completions pattern table (lambda (assoc) (funcall predicate (car assoc)))))
-                  (win (selected-window))
-                  (buffer-name (sclang-make-buffer-name "Completions"))
-                  (same-window-buffer-names (list buffer-name)))
-             (setq list (sort list 'string<))
-             (with-sclang-browser
-              buffer-name
-              (add-hook 'sclang-browser-show-hook (lambda () (sclang-browser-next-link)))
-              (setq sclang-browser-link-function
-                    (lambda (arg)
-                      (sclang-browser-quit)
-                      (with-current-buffer (car arg)
-                        (delete-region (car (cdr arg)) (point))
-                        (insert (cdr (cdr arg))))))
-              ;; (setq view-exit-action 'kill-buffer)
-              (insert (format "Completions for '%s':\n\n" pattern))
-              (dolist (x list)
-                (insert (sclang-browser-make-link x (cons buffer (cons beg x))))
-                (insert " \n"))))
-           (sclang-message "Making completion list...%s" "done")))))
+	  ((null completion)
+	   (sclang-message "Can't find completion for '%s'" pattern)
+	   (ding))
+	  ((not (string= pattern completion))
+	   (delete-region beg end)
+	   (insert completion))
+	  (t
+	   (sclang-message "Making completion list...")
+	   (let* ((list (all-completions pattern table (lambda (assoc) (funcall predicate (car assoc)))))
+		  (win (selected-window))
+		  (buffer-name (sclang-make-buffer-name "Completions"))
+		  (same-window-buffer-names (list buffer-name)))
+	     (setq list (sort list 'string<))
+	     (with-sclang-browser
+	      buffer-name
+	      (add-hook 'sclang-browser-show-hook (lambda () (sclang-browser-next-link)))
+	      (setq sclang-browser-link-function
+		    (lambda (arg)
+		      (sclang-browser-quit)
+		      (with-current-buffer (car arg)
+			(delete-region (car (cdr arg)) (point))
+			(insert (cdr (cdr arg))))))
+	      ;; (setq view-exit-action 'kill-buffer)
+	      (insert (format "Completions for '%s':\n\n" pattern))
+	      (dolist (x list)
+		(insert (sclang-browser-make-link x (cons buffer (cons beg x))))
+		(insert " \n"))))
+	   (sclang-message "Making completion list...%s" "done")))))
+
+(defun sclang-completion-at-point ()
+  "Function used for `completion-at-point-functions' in `sclang-mode'."
+  (let* ((end (point))
+	 (beg (save-excursion
+		(backward-sexp 1)
+		(skip-syntax-forward "'")
+		(point)))
+	 (pattern (buffer-substring-no-properties beg end))
+	 (case-fold-search nil)
+	 (predicate (if (sclang-class-name-p pattern)
+                        #'sclang-class-name-p
+                      #'sclang-method-name-p)))
+    (list beg
+          end
+          (all-completions pattern sclang-symbol-table predicate)
+          :exclusive 'no
+          :company-docsig #'identity)))
 
 ;; =====================================================================
 ;; introspection
@@ -464,18 +487,18 @@ are considered."
 
 ;; really do that?
 (add-hook 'sclang-library-startup-hook
-          (lambda ()
-            (setq sclang-definition-marker-ring
-                  (make-ring sclang-definition-marker-ring-length))))
+	  (lambda ()
+	    (setq sclang-definition-marker-ring
+		  (make-ring sclang-definition-marker-ring-length))))
 
 (defun sclang-open-definition (name file pos &optional pos-func)
   (let ((buffer (find-file file)))
     (when (bufferp buffer)
       (with-current-buffer buffer
-        (goto-char (or pos (point-min)))
-        (when (and nil (functionp pos-func))
-          (let ((pos (funcall pos-func name)))
-            (and pos (goto-char pos))))))
+	(goto-char (or pos (point-min)))
+	(when (and nil (functionp pos-func))
+	  (let ((pos (funcall pos-func name)))
+	    (and pos (goto-char pos))))))
     buffer))
 
 (defun sclang-pop-definition-mark ()
@@ -484,35 +507,35 @@ are considered."
   (unless (ring-empty-p sclang-definition-marker-ring)
     (let ((marker (ring-remove sclang-definition-marker-ring 0)))
       (switch-to-buffer (or (marker-buffer marker)
-                            (error "The marked buffer has been deleted")))
+			    (error "The marked buffer has been deleted")))
       (goto-char (marker-position marker))
       (set-marker marker nil nil))))
 
 (defun sclang-browse-definitions (name definitions buffer-name header &optional pos-func)
   (if (cdr definitions)
       (let ((same-window-buffer-names (list buffer-name)))
-        (with-sclang-browser
-         buffer-name
-         ;; (setq view-exit-action 'kill-buffer)
-         (setq sclang-browser-link-function
-               (lambda (data)
-                 (sclang-browser-quit)
-                 (apply 'sclang-open-definition data)))
-         (add-hook 'sclang-browser-show-hook (lambda () (sclang-browser-next-link)))
-         (insert header)
-         (insert "\n")
-         (let ((max-width 0)
-               format-string)
-           (dolist (def definitions)
-             (setq max-width (max (length (file-name-nondirectory (nth 1 def))) max-width)))
-           (setq format-string (format "%%-%ds  %%s" max-width))
-           (dolist (def definitions)
-             (let ((string (format format-string
-                                   (propertize (file-name-nondirectory (nth 1 def)) 'face 'bold)
-                                   (nth 0 def)))
-                   (data (list name (nth 1 def) (nth 2 def) pos-func)))
-               (insert (sclang-browser-make-link string data))
-               (insert "\n"))))))
+	(with-sclang-browser
+	 buffer-name
+	 ;; (setq view-exit-action 'kill-buffer)
+	 (setq sclang-browser-link-function
+	       (lambda (data)
+		 (sclang-browser-quit)
+		 (apply 'sclang-open-definition data)))
+	 (add-hook 'sclang-browser-show-hook (lambda () (sclang-browser-next-link)))
+	 (insert header)
+	 (insert "\n")
+	 (let ((max-width 0)
+	       format-string)
+	   (dolist (def definitions)
+	     (setq max-width (max (length (file-name-nondirectory (nth 1 def))) max-width)))
+	   (setq format-string (format "%%-%ds  %%s" max-width))
+	   (dolist (def definitions)
+	     (let ((string (format format-string
+				   (propertize (file-name-nondirectory (nth 1 def)) 'face 'bold)
+				   (nth 0 def)))
+		   (data (list name (nth 1 def) (nth 2 def) pos-func)))
+	       (insert (sclang-browser-make-link string data))
+	       (insert "\n"))))))
     ;; single definition: jump directly
     (let ((def (car definitions)))
       (sclang-open-definition name (nth 1 def) (nth 2 def) pos-func))))
@@ -522,61 +545,61 @@ are considered."
   (interactive
    (list
     (if current-prefix-arg
-        (read-string "Find definition: ")
+	(read-string "Find definition: ")
       (sclang-read-symbol "Find definitions of: "
-                          (sclang-symbol-at-point) nil t))))
+			  (sclang-symbol-at-point) nil t))))
   (if (sclang-symbol-match sclang-method-definition-spec-regexp name)
       (sclang-perform-command 'openDefinition name)
     (if (sclang-get-symbol name)
-        (progn
-          (ring-insert sclang-definition-marker-ring (point-marker))
-          (if (sclang-class-name-p name)
-              (sclang-perform-command 'classDefinitions name)
-            (sclang-perform-command 'methodDefinitions name)))
+	(progn
+	  (ring-insert sclang-definition-marker-ring (point-marker))
+	  (if (sclang-class-name-p name)
+	      (sclang-perform-command 'classDefinitions name)
+	    (sclang-perform-command 'methodDefinitions name)))
       (sclang-message "'%s' is undefined" name))))
 
 (sclang-set-command-handler
  'openDefinition
  (lambda (assoc)
    (let ((name (car assoc))
-         (data (cdr assoc)))
+	 (data (cdr assoc)))
      (if data
-         (sclang-open-definition nil (car data) (cadr data))
+	 (sclang-open-definition nil (car data) (cadr data))
        (sclang-message "'%s' is undefined" name)))))
 
 (sclang-set-command-handler
  'classDefinitions
  (lambda (assoc)
    (let ((name (car assoc))
-         (data (cdr assoc)))
+	 (data (cdr assoc)))
      (if data
-         (sclang-browse-definitions
-          name data
-          "*Definitions*" (format "Definitions of '%s'\n" name)
-          (lambda (name)
-            (let ((case-fold-search nil))
-              ;; point is either
-              ;;  - at a class definition
-              ;;  - inside a class extension
-              ;; so jump to the class name
-              (when (or (looking-at (sclang-make-class-definition-regexp name))
-                        (re-search-backward (sclang-make-class-extension-regexp name) nil t))
-                (match-beginning 1)))))
+	 (sclang-browse-definitions
+	  name data
+	  "*Definitions*" (format "Definitions of '%s'\n" name)
+	  (lambda (name)
+	    (let ((case-fold-search nil))
+	      ;; point is either
+	      ;;  - at a class definition
+	      ;;  - inside a class extension
+	      ;; so jump to the class name
+	      (when (or (looking-at (sclang-make-class-definition-regexp name))
+			(re-search-backward (sclang-make-class-extension-regexp name) nil t))
+		(match-beginning 1)))))
        (sclang-message "No definitions of '%s'" name)))))
 
 (sclang-set-command-handler
  'methodDefinitions
  (lambda (assoc)
    (let ((name (car assoc))
-         (data (cdr assoc)))
+	 (data (cdr assoc)))
      (if data
-         (sclang-browse-definitions
-          name data
-          "*Definitions*" (format "Definitions of '%s'\n" name)
-          (lambda (name)
-            (let ((case-fold-search nil))
-              (when (re-search-forward (sclang-make-method-definition-regexp name))
-                (match-beginning 1)))))
+	 (sclang-browse-definitions
+	  name data
+	  "*Definitions*" (format "Definitions of '%s'\n" name)
+	  (lambda (name)
+	    (let ((case-fold-search nil))
+	      (when (re-search-forward (sclang-make-method-definition-regexp name))
+		(match-beginning 1)))))
        (sclang-message "No definitions of '%s'" name)))))
 
 (defun sclang-find-references (name)
@@ -584,52 +607,52 @@ are considered."
   (interactive
    (list
     (sclang-read-symbol "Find references to: "
-                        (sclang-symbol-at-point) nil t)))
+			(sclang-symbol-at-point) nil t)))
   (if (sclang-get-symbol name)
       (progn
-        (ring-insert sclang-definition-marker-ring (point-marker))
-        (sclang-perform-command 'methodReferences name))
+	(ring-insert sclang-definition-marker-ring (point-marker))
+	(sclang-perform-command 'methodReferences name))
     (sclang-message "'%s' is undefined" name)))
 
 (sclang-set-command-handler
  'methodReferences
  (lambda (assoc)
    (let ((name (car assoc))
-         (data (cdr assoc)))
+	 (data (cdr assoc)))
      (if data
-         (sclang-browse-definitions
-          name data
-          "*References*" (format "References to '%s'\n" name)
-          (lambda (name)
-            (let ((case-fold-search nil))
-              (when (re-search-forward (regexp-quote name))
-                (match-beginning 0)))))
+	 (sclang-browse-definitions
+	  name data
+	  "*References*" (format "References to '%s'\n" name)
+	  (lambda (name)
+	    (let ((case-fold-search nil))
+	      (when (re-search-forward (regexp-quote name))
+		(match-beginning 0)))))
        (sclang-message "No references to '%s'" name)))))
 
 (defun sclang-show-method-args ()
   "whooha. in full effect."
   (interactive)
   (let ((regexp (concat
-                 sclang-class-name-regexp
-                 "[ \t\n]*\\(?:\\.[ \t\n]*\\("
-                 sclang-method-name-regexp
-                 "\\)\\)?[ \t\n]*("))
-        (case-fold-search nil)
-        (beg (point)))
+		 sclang-class-name-regexp
+		 "[ \t\n]*\\(?:\\.[ \t\n]*\\("
+		 sclang-method-name-regexp
+		 "\\)\\)?[ \t\n]*("))
+	(case-fold-search nil)
+	(beg (point)))
     (save-excursion
       (while (and (re-search-backward regexp nil t)
-                  (let ((class (save-match-data (sclang-get-symbol (sclang-symbol-at-point)))))
-                    (goto-char (1- (match-end 0)))
-                    (if (condition-case nil
-                            (save-excursion
-                              (forward-list 1)
-                              (> (point) beg))
-                          (error t))
-                        (let ((method (sclang-get-symbol (or (match-string-no-properties 1) "new"))))
-                          (and class method
-                               (sclang-perform-command 'methodArgs class method)
-                               nil))
-                      (goto-char (match-beginning 0)) t)))))))
+		  (let ((class (save-match-data (sclang-get-symbol (sclang-symbol-at-point)))))
+		    (goto-char (1- (match-end 0)))
+		    (if (condition-case nil
+			    (save-excursion
+			      (forward-list 1)
+			      (> (point) beg))
+			  (error t))
+			(let ((method (sclang-get-symbol (or (match-string-no-properties 1) "new"))))
+			  (and class method
+			       (sclang-perform-command 'methodArgs class method)
+			       nil))
+		      (goto-char (match-beginning 0)) t)))))))
 
 (sclang-set-command-handler
  'methodArgs
@@ -641,11 +664,11 @@ are considered."
   (interactive
    (list
     (let* ((symbol (sclang-symbol-at-point))
-           (class (and (sclang-get-symbol symbol)
-                       (sclang-class-name-p symbol)
-                       symbol)))
+	   (class (and (sclang-get-symbol symbol)
+		       (sclang-class-name-p symbol)
+		       symbol)))
       (sclang-read-symbol "Dump interface of: "
-                          class 'sclang-class-name-p t))))
+			  class 'sclang-class-name-p t))))
   (sclang-eval-string (format "%s.dumpFullInterface" class)))
 
 (defun sclang-dump-interface (class)
@@ -653,11 +676,11 @@ are considered."
   (interactive
    (list
     (let* ((symbol (sclang-symbol-at-point))
-           (class (and (sclang-get-symbol symbol)
-                       (sclang-class-name-p symbol)
-                       symbol)))
+	   (class (and (sclang-get-symbol symbol)
+		       (sclang-class-name-p symbol)
+		       symbol)))
       (sclang-read-symbol "Dump interface of: "
-                          class 'sclang-class-name-p t))))
+			  class 'sclang-class-name-p t))))
   (sclang-eval-string (format "%s.dumpInterface" class)))
 
 ;; =====================================================================
@@ -682,11 +705,11 @@ current-directory, iff `sclang-source-directoy' is nil."
   (interactive
    (let ((default (sclang-symbol-at-point sclang-primitive-name-regexp)))
      (list (read-string (sclang-make-prompt-string "Find primitive: " default)
-                        nil nil default))))
+			nil nil default))))
   (if (require 'xcscope nil t)
       (let ((cscope-initial-directory sclang-source-directory))
-        (cscope-find-this-text-string
-         (if (string-match "^_" name) name (concat "_" name))))
+	(cscope-find-this-text-string
+	 (if (string-match "^_" name) name (concat "_" name))))
     (sclang-message "cscope not available")))
 
 ;; =====================================================================
@@ -700,16 +723,16 @@ current-directory, iff `sclang-source-directoy' is nil."
 
 (defun sclang-object-to-string (obj)
   (cond ((null obj)
-         "nil")
-        ((eq false obj)
-         "false")
-        ((eq t obj)
-         "true")
-        ((symbolp obj)
-         (format "'%s'" obj))
-        ((listp obj)
-         (format "[ %s ]" (sclang-list-to-string obj)))
-        (t (format "%S" obj))))
+	 "nil")
+	((eq false obj)
+	 "false")
+	((eq t obj)
+	 "true")
+	((symbolp obj)
+	 (format "'%s'" obj))
+	((listp obj)
+	 (format "[ %s ]" (sclang-list-to-string obj)))
+	(t (format "%S" obj))))
 
 (defun sclang-format (string &rest args)
   "format chars:
@@ -717,28 +740,28 @@ current-directory, iff `sclang-source-directoy' is nil."
      %o - print object
      %l - print argument list"
   (let ((case-fold-search nil)
-        (i 0))
+	(i 0))
     (save-match-data
       (while (and (< i (length string))
-                  (string-match "%[los%]" string i))
-        (let* ((start (car (match-data)))
-               (format (aref string (1+ start)))
-               (arg (if args
-                        (pop args)
-                      (error "Not enough arguments for format string")))
-               (repl (cond ((eq ?o format)
-                            (sclang-object-to-string arg))
-                           ((eq ?l format)
-                            (if (listp arg)
-                                (sclang-list-to-string arg)
-                              (sclang-object-to-string arg)))
-                           ((eq ?s format)
-                            (format "%s" arg))
-                           ((eq ?% format)
-                            (push arg args)
-                            "%"))))
-          (setq string (replace-match repl t t string))
-          (setq i (+ start (length repl)))))))
+		  (string-match "%[los%]" string i))
+	(let* ((start (car (match-data)))
+	       (format (aref string (1+ start)))
+	       (arg (if args
+			(pop args)
+		      (error "Not enough arguments for format string")))
+	       (repl (cond ((eq ?o format)
+			    (sclang-object-to-string arg))
+			   ((eq ?l format)
+			    (if (listp arg)
+				(sclang-list-to-string arg)
+			      (sclang-object-to-string arg)))
+			   ((eq ?s format)
+			    (format "%s" arg))
+			   ((eq ?% format)
+			    (push arg args)
+			    "%"))))
+	  (setq string (replace-match repl t t string))
+	  (setq i (+ start (length repl)))))))
   string)
 
 (defun sclang-format-pseq (items)
@@ -746,52 +769,52 @@ current-directory, iff `sclang-source-directoy' is nil."
 Looks for all repetitive patterns in ITEMS recursively.  Therefore, it is
 computationally expensive, especially when ITEMS is a long list.  If you don't
 want smart pattern guessing, use `sclang-format' directly to format your Pseq."
-  (flet ((find-reps (items)
-           (let (r)
-             (while items
-               (let ((ret (car items))
-                     (skip 1)
-                     (rep (length items)))
-                 (catch 'match-found
-                   (while (>= rep 2)
-                     (let ((i (/ (length items) rep)))
-                       (while (> i 0)
-                         (let ((sublst (subseq items 0 i)))
-                           (when (catch 'equal
-                                   (let ((a items))
-                                     (loop repeat rep do
-                                           (let ((b sublst))
-                                             (while b
-                                               (unless (eql (car b) (car a))
-                                                 (throw 'equal nil))
-                                               (setq a (cdr a)
-                                                     b (cdr b)))))
-                                     t))
-                             (setq ret (cons rep (if (> i 5)
-                                                     (find-reps sublst)
-                                                   sublst))
-                                   skip (* i rep))
-                             (throw 'match-found t))
-                           (decf i))))
-                     (decf rep)))
-                 (accept-process-output nil 0 100)
-                 (message "Processed...%S" ret) ;; invent better progress info
-                 (setq r (append r (list ret))
-                       items (nthcdr skip items))))
-             r))
-         (elem-to-string (elem)
-           (cond
-            ((consp elem)
-             (concat "Pseq([ "
-                     (mapconcat #'elem-to-string (cdr elem) ", ")
-                     (format " ], %d)" (car elem))))
-            (t (sclang-object-to-string elem)))))
+  (cl-labels ((find-reps (items)
+	       (let (r)
+		 (while items
+		   (let ((ret (car items))
+			 (skip 1)
+			 (rep (length items)))
+		     (catch 'match-found
+		       (while (>= rep 2)
+			 (let ((i (/ (length items) rep)))
+			   (while (> i 0)
+			     (let ((sublst (cl-subseq items 0 i)))
+			       (when (catch 'equal
+				       (let ((a items))
+					 (cl-loop repeat rep do
+						  (let ((b sublst))
+						    (while b
+						      (unless (eql (car b) (car a))
+							(throw 'equal nil))
+						      (setq a (cdr a)
+							    b (cdr b)))))
+					 t))
+				 (setq ret (cons rep (if (> i 5)
+							 (find-reps sublst)
+						       sublst))
+				       skip (* i rep))
+				 (throw 'match-found t))
+			       (cl-decf i))))
+			 (cl-decf rep)))
+		     (accept-process-output nil 0 100)
+		     (message "Processed...%S" ret) ;; invent better progress info
+		     (setq r (append r (list ret))
+			   items (nthcdr skip items))))
+		 r))
+	      (elem-to-string (elem)
+	       (cond
+		((consp elem)
+		 (concat "Pseq([ "
+			 (mapconcat #'elem-to-string (cdr elem) ", ")
+			 (format " ], %d)" (car elem))))
+		(t (sclang-object-to-string elem)))))
     (let ((compressed (find-reps items)))
       (if (and (= (length compressed) 1) (consp (car compressed)))
-          (elem-to-string (car compressed))
-        (concat "Pseq([ "
-                (mapconcat #'elem-to-string compressed ", ")
-                " ], 1)")))))
+	  (elem-to-string (car compressed))
+	(concat "Pseq([ "
+		(mapconcat #'elem-to-string compressed ", ")
+		" ], 1)")))))
 
 ;; =====================================================================
 ;; module setup

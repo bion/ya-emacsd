@@ -4,6 +4,7 @@
   (normal-top-level-add-subdirs-to-load-path))
 
 (setq use-package-always-ensure t)
+(setq-default indent-tabs-mode nil)
 
 (setq ring-bell-function 'ignore)
 (setq mac-option-key-is-meta nil)
@@ -13,6 +14,8 @@
 
 (toggle-frame-maximized)
 
+(require 'smex)
+(require 'eclim)
 (require 'ido)
 (require 'simp)
 (require 'auto-complete)
@@ -32,8 +35,14 @@
 (require 'my-settings)
 (require 'my-initializers)
 (require 'my-project-definitions)
-(package-initialize)
 (require 'my-add-to-lists)
 (require 'fill-column-indicator)
+
+(require 'web-mode)
+(require 'elixir-mode)
+(require 'yaml-mode)
+(require 'move-dup)
+(require 'sclang)
+(require 'w3m)
 
 (server-start)

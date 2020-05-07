@@ -1,8 +1,18 @@
-;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*-
+;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*- 
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("app.boundless.co"
+(("sclang-includes"
+ (filename . "~/Library/Application Support/SuperCollider/include/")
+ (front-context-string . "keyboard_instrum")
+ (rear-context-string . "42 Feb 16 11:47 ")
+ (position . 262))
+("sc-classes"
+ (filename . "/Applications/SuperCollider/SuperCollider.app/Contents/Resources/SCClassLibrary/custom/")
+ (front-context-string)
+ (rear-context-string . "Nov  4 01:38 ..\n")
+ (position . 237))
+("app.boundless.co"
  (filename . "~/work/boundless/app.boundless.co/")
  (front-context-string . "  /Users/bion/wo")
  (rear-context-string)

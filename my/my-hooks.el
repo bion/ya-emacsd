@@ -12,6 +12,9 @@
 (defun major-mode-match-p (mode)
   (string-match mode (symbol-name major-mode)))
 
+(defun my-java-mode-hook ()
+    (eclim-mode t))
+
 (hook-unless 'find-file-hook (major-mode-match-p "makefile") (untabify-all))
 (hook-unless 'find-file-hook buffer-read-only (delete-trailing-whitespace))
 (hook-unless 'before-save-hook (major-mode-match-p "makefile") (untabify-all))
@@ -21,12 +24,16 @@
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 (add-hook 'emms-player-started-hook 'emms-show)
 (add-hook 'after-init-hook 'inf-ruby-switch-setup)
-(add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
+
+(eval-after-load 'web-mode
+  '(add-hook 'web-mode-hook (lambda () (add-hook 'after-save-hook 'eslint-fix nil t))))
 
 (add-hook
  'magit-status-mode-hook
  (lambda ()
    (define-key magit-mode-map (kbd "Z") 'magit-quick-stash)))
+
+(add-hook 'java-mode-hook 'my-java-mode-hook)
 
 (add-hook
  'dired-mode-hook
@@ -56,12 +63,6 @@
 (add-hook
  'js2-mode-hook
  (lambda ()
-   (linum-mode)))
-
-(add-hook
- 'web-mode-hook
- (lambda ()
-   (prettier-js-mode)
    (linum-mode)))
 
 (add-hook

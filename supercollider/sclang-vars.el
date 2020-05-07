@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2005  Free Software Foundation, Inc.
 
-;; Author: Mario Lang <mlang@delysid.org>
+;; Author: Mario Lang <mlang@blind.guru>
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

@@ -43,7 +43,7 @@
   (interactive)
   (when (get-text-property (point) 'sclang-browser-link)
     (while (and (not (bobp))
-                (get-text-property (point) 'sclang-browser-link))
+		(get-text-property (point) 'sclang-browser-link))
       (forward-char -1))
     (unless (bobp) (forward-char 1))
     (point)))
@@ -51,26 +51,26 @@
 (defun sclang-browser-next-link (&optional n)
   (interactive)
   (let* ((n (or n 1))
-         (prop 'sclang-browser-link)
-         (fwd (>= n 0))
-         (orig (point))
-         (beg (if fwd (point-min) (point-max)))
-         (end (if fwd (point-max) (point-min)))
-         (inc (if fwd 1 -1))
-         pos)
+	 (prop 'sclang-browser-link)
+	 (fwd (>= n 0))
+	 (orig (point))
+	 (beg (if fwd (point-min) (point-max)))
+	 (end (if fwd (point-max) (point-min)))
+	 (inc (if fwd 1 -1))
+	 pos)
     (when (get-text-property (point) prop)
       (while (and (/= (point) beg)
-                  (get-text-property (point) prop))
-        (forward-char inc))
+		  (get-text-property (point) prop))
+	(forward-char inc))
       (if (= (point) beg) (goto-char end)))
     (while (not (eq pos orig))
       (cond ((get-text-property (point) prop)
-             (sclang-browser-beginning-of-link)
-             (setq pos orig))
-            (t
-             (if (= (point) end) (goto-char beg))
-             (forward-char inc)
-             (setq pos (point)))))))
+	     (sclang-browser-beginning-of-link)
+	     (setq pos orig))
+	    (t
+	     (if (= (point) end) (goto-char beg))
+	     (forward-char inc)
+	     (setq pos (point)))))))
 
 (defun sclang-browser-previous-link ()
   (interactive)
@@ -79,20 +79,20 @@
 (defun sclang-browser-follow-link (&optional pos)
   (interactive)
   (let* ((pos (or pos (point)))
-         (data (get-text-property pos 'sclang-browser-link)))
+	 (data (get-text-property pos 'sclang-browser-link)))
     (when (consp data)
       (let ((fun (or (car data) sclang-browser-link-function))
-            (arg (cdr data)))
-        (when (functionp fun)
-          (condition-case nil
-              (funcall fun arg)
-            (error (sclang-message "Error in link function") nil)))))))
+	    (arg (cdr data)))
+	(when (functionp fun)
+	  (condition-case nil
+	      (funcall fun arg)
+	    (error (sclang-message "Error in link function") nil)))))))
 
 (defun sclang-browser-mouse-follow-link (event)
   (interactive "e")
   (let* ((start (event-start event))
-         (window (car start))
-         (pos (cadr start)))
+	 (window (car start))
+	 (pos (cadr start)))
     (with-current-buffer (window-buffer window)
       (sclang-browser-follow-link pos))))
 
@@ -123,7 +123,7 @@ Commands:
 (defun sclang-browser-mode-finish ()
   (toggle-read-only 1)
   (setq view-return-to-alist
-        (list (cons (selected-window) sclang-browser-return-method)))
+	(list (cons (selected-window) sclang-browser-return-method)))
   (run-hooks 'sclang-browser-show-hook))
 
 (defun sclang-browser-quit ()
@@ -134,42 +134,42 @@ Commands:
 (defun sclang-browser-make-link (link-text &optional link-data link-function)
   (let ((map (make-sparse-keymap)))
     (propertize link-text
-                'mouse-face 'highlight
-                ;;'help-echo "mouse-2: follow link"
-                ;;'keymap map
-                'sclang-browser-link (cons link-function link-data)
-                ;;'sclang-browser-link-data link-data
-                ;;'sclang-browser-link-function link-function)))
-                )))
+		'mouse-face 'highlight
+		;;'help-echo "mouse-2: follow link"
+		;;'keymap map
+		'sclang-browser-link (cons link-function link-data)
+		;;'sclang-browser-link-data link-data
+		;;'sclang-browser-link-function link-function)))
+		)))
 
 (defun sclang-display-browser (buffer-name output-function)
   "header: what to insert in the buffer
    link-list: list of (link-text link-function link-data)
    link-function: function with args (link-text link-data)"
   (let ((temp-buffer-setup-hook '(sclang-browser-mode-setup))
-        (temp-buffer-show-hook '(sclang-browser-mode-finish)))
+	(temp-buffer-show-hook '(sclang-browser-mode-finish)))
     (with-output-to-temp-buffer buffer-name
       (with-current-buffer standard-output
-        ;; record return method
-        (setq sclang-browser-return-method
-              (cond ((special-display-p (buffer-name standard-output))
-                     ;; If the help output buffer is a special display buffer,
-                     ;; don't say anything about how to get rid of it.
-                     ;; First of all, the user will do that with the window
-                     ;; manager, not with Emacs.
-                     ;; Secondly, the buffer has not been displayed yet,
-                     ;; so we don't know whether its frame will be selected.
-                     (cons (selected-window) t))
-                    (display-buffer-reuse-frames
-                     (cons (selected-window) 'quit-window))
-                    ((not (one-window-p t))
-                     (cons (selected-window) 'quit-window))
-                    (pop-up-windows
-                     (cons (selected-window) t))
-                    (t
-                     (list (selected-window) (window-buffer)
-                           (window-start) (window-point)))))
-        (funcall output-function)))))
+	;; record return method
+	(setq sclang-browser-return-method
+	      (cond ((special-display-p (buffer-name standard-output))
+		     ;; If the help output buffer is a special display buffer,
+		     ;; don't say anything about how to get rid of it.
+		     ;; First of all, the user will do that with the window
+		     ;; manager, not with Emacs.
+		     ;; Secondly, the buffer has not been displayed yet,
+		     ;; so we don't know whether its frame will be selected.
+		     (cons (selected-window) t))
+		    (display-buffer-reuse-frames
+		     (cons (selected-window) 'quit-window))
+		    ((not (one-window-p t))
+		     (cons (selected-window) 'quit-window))
+		    (pop-up-windows
+		     (cons (selected-window) t))
+		    (t
+		     (list (selected-window) (window-buffer)
+			   (window-start) (window-point)))))
+	(funcall output-function)))))
 
 (defmacro with-sclang-browser (buffer-name &rest body)
   `(sclang-display-browser ,buffer-name (lambda () ,@body)))

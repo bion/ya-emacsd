@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2005  Free Software Foundation, Inc.
 
-;; Author: mlang <mlang@delysid.org>
+;; Author: Mario Lang <mlang@blind.guru>
 ;; Keywords: comm
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (eval-when-compile (require 'sclang-util)
                    (require 'sclang-language))
 (eval-and-compile (require 'sclang-interp))
@@ -76,9 +77,9 @@
 (sclang-set-command-handler
  '_widgetSetStates
  (lambda (arg)
-   (multiple-value-bind (buffer id states value) arg
+   (cl-multiple-value-bind (buffer id states value) arg
      (with-current-buffer (get-buffer buffer)
-       (let ((widget (cdr (find id sclang-widgets :key 'car))))
+       (let ((widget (cdr (cl-find id sclang-widgets :key 'car))))
 	 (widget-put widget :states states)
 	 (widget-value-set widget value)
 	 value)))))

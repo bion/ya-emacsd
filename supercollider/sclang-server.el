@@ -15,15 +15,16 @@
 ;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 ;; USA
 
+(require 'cl-lib)
+
 (eval-when-compile
-  (require 'cl)
   (require 'sclang-util)
   (require 'sclang-interp)
   (require 'sclang-language)
   (require 'sclang-mode))
 
 (defcustom sclang-server-panel "Server.default.makeWindow"
-  "*Expression to execute when `sclang-show-server-panel' is invoked."
+  "Expression to execute when `sclang-show-server-panel' is invoked."
   :group 'sclang-interface
   :type '(choice (const "Server.default.makeWindow")
 		 (const "\\SCUM.asClass.do { \\SCUM.asClass.desktop.showServerPanel }")
@@ -61,7 +62,7 @@
  '_updateServer
  (lambda (arg)
    (setq sclang-server-alist
-	 (sort (cdr arg) (lambda (a b) (string< (car a) (car b)))))
+	 (sort (cdr arg) (lambda (a b) (string-lessp (car a) (car b)))))
    (setq sclang-default-server (car arg))
    (unless sclang-current-server-initialized
      ;; only set the current server automatically once after startup
@@ -73,9 +74,9 @@
   "Select next server for display."
   (interactive)
   (sclang-set-server)
-  (let ((list (or (cdr (member-if (lambda (assoc)
-				    (eq (car assoc) sclang-current-server))
-				  sclang-server-alist))
+  (let ((list (or (cdr (cl-member-if (lambda (assoc)
+				       (eq (car assoc) sclang-current-server))
+				     sclang-server-alist))
 		  sclang-server-alist)))
     (setq sclang-current-server (car (car list))))
   (sclang-update-server-info))
@@ -99,8 +100,7 @@
      ["Quit" sclang-server-quit]
      "-"
      ["Free All" sclang-server-free-all :active (sclang-server-running-p)]
-     ["Make Default" sclang-server-make-default]
-     )))
+     ["Make Default" sclang-server-make-default])))
 
 (defun sclang-server-fill-mouse-map (map prefix)
   (define-key map (vector prefix 'mouse-1) 'sclang-mouse-next-server)
@@ -120,7 +120,7 @@
   (define-key map [?o] 'sclang-server-dump-osc)
   (define-key map [?p] 'sclang-show-server-panel)
   (define-key map [?q] 'sclang-server-quit)
-  (flet ((fill-record-map (map)
+  (cl-flet ((fill-record-map (map)
 			  (define-key map [?n] 'sclang-server-prepare-for-record)
 			  (define-key map [?p] 'sclang-server-pause-recording)
 			  (define-key map [?r] 'sclang-server-record)
@@ -159,7 +159,7 @@
   (interactive)
   (sclang-set-server)
   (setq sclang-server-info-string (sclang-get-server-info-string))
-  (force-mode-line-update))
+  (force-mode-line-update t))
 
 ;; =====================================================================
 ;; language control
